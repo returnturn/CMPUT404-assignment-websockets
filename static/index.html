@@ -47,15 +47,19 @@ world = {};
 //XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
     with(context) {
-        beginPath();                
+        beginPath();              
         lineWidth = 3;
         var x = entity["x"];
         var y = entity["y"];
         //moveTo(x,y);
-        fillStyle = entity["colour"];
-        strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
-        stroke();                                
+        pokemon = ["pokeball.png", "greatball.png","masterball.png"]
+        var pokeball = new Image();
+        var num = new Date().getTime() / 1000;
+        num%=10;
+        if(num<3) pokeball.src = pokemon[1];
+        else if(num<5) pokeball.src = pokemon[2];
+        else pokeball.src = pokemon[0];
+        drawImage(pokeball, x, y);                          
     }
 }
 
