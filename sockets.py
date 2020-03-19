@@ -163,7 +163,7 @@ def get_entity(entity):
 def clear():
     '''Clear the world out!'''
     myWorld.clear()
-    return flask.Response(response="", content_type="application/json")
+    return flask.Response(response="{}", content_type="application/json")
 
 
 
