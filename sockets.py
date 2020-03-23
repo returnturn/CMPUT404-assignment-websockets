@@ -78,9 +78,9 @@ class Client:
 
 clients = []
 
-def send_all(obj):
+def send_all(msg):
     for client in clients:
-        client.put(obj)
+        client.put(msg)
 
 def send_all_json(obj):
     send_all(json.dumps(obj))
@@ -95,18 +95,18 @@ def read_ws(ws,client):
     # XXX: TODO IMPLEMENT ME
     try:
         while True:
-            data = ws.receive()
-            print("WS RECV: {}".format(data))
-            if data:
-                packet = json.loads(data)
+            msg = ws.receive()
+            print("WS RECV: {}".format(msg))
+            if msg:
+                packet = json.loads(msg)
                 send_all_json(packet)
                 for entity in packet:
                     myWorld.set(entity, packet[entity])
                 send_all_json(packet)
             else:
                 break
-    except Exception as e:
-        raise e
+    except:
+        '''Done'''
 
 @sockets.route('/subscribe')
 def subscribe_socket(ws):
@@ -118,10 +118,10 @@ def subscribe_socket(ws):
     g = gevent.spawn(read_ws, ws, client)
     try:
         while True:
-            data = client.get()
-            ws.send(data)
+            msg = client.get()
+            ws.send(msg)
     except Exception as e:
-        raise e
+        print("WS Error {}".format(e))
     finally:
         clients.remove(client)
         gevent.kill(g)
@@ -145,25 +145,25 @@ def update(entity):
     updateStuff = flask_post_json()
     for key,value in updateStuff.items():
         myWorld.update(entity, key, value)
-    return flask.Response(response=json.dumps(myWorld.get(entity)), content_type="application/json")
+    return jsonify(myWorld.get(entity))
 
 
 @app.route("/world", methods=['POST','GET'])    
 def world():
     '''you should probably return the world here'''
-    return flask.Response(response=json.dumps(myWorld.world()), content_type="application/json")
+    return jsonify(myWorld.space)
 
 @app.route("/entity/<entity>")    
 def get_entity(entity):
     '''This is the GET version of the entity interface, return a representation of the entity'''
-    return flask.Response(response=json.dumps(myWorld.get(entity)), content_type="application/json")
+    return jsonify(myWorld.get(entity))
 
 
 @app.route("/clear", methods=['POST','GET'])
 def clear():
     '''Clear the world out!'''
     myWorld.clear()
-    return flask.Response(response="{}", content_type="application/json")
+    return jsonify(myWorld.space)
 
 
 
